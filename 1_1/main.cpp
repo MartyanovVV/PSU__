@@ -15,14 +15,22 @@ unsigned long long Sum(const std::string &s, int table_size) {
 }
 
 int Hash(const std::string &s, int i, int table_size, unsigned long long k = 0) {
-    if (s.empty()) return 0;
-    return (k + i * i / 2 + i / 4) % table_size;
+    return (k + i * i / 2 + i / 2) % table_size;
 }
 
 class HashTable {
 private:
     std::vector<std::string> table;
     int Size;
+    void ReTable() {
+        HashTable table2(table.size() * 2);
+        for (std::string &elem: table) {
+            if (elem != "0" && elem != Deleted) {
+                table2.Add(elem);
+            }
+        }
+        *this = std::move(table2);
+    }
 
 public:
     explicit HashTable(int table_size) : table(table_size, "0"), Size(0) {}
@@ -36,16 +44,16 @@ public:
         while (iteration <= table.size()) {
             if (table[hash] == s) {
                 return {true, hash};
-            } else if (table[hash] == "0") {
-                return {false, hash_string == hash0 ? hash : hash_string};
-            } else if (hash0 == hash_string && table[hash] == Deleted) {
-                hash_string = hash;
-                iteration += 1;
-                hash = Hash(s, iteration, table.size(), hash0);
-            } else {
-                iteration += 1;
-                hash = Hash(s, iteration, table.size(), hash0);
             }
+            if (table[hash] == "0") {
+                return {false, hash_string == hash0 ? hash : hash_string};
+            }
+            if (hash0 == hash_string && table[hash] == Deleted) {
+                hash_string = hash;
+            }
+            iteration += 1;
+            hash = Hash(s, iteration, table.size(), hash0);
+            
         }
         return {false, hash_string};
     }
@@ -70,16 +78,6 @@ public:
         }
         table[has_pair.second] = Deleted;
         return true;
-    }
-
-    void ReTable() {
-        HashTable table2(table.size() * 2);
-        for (std::string &elem: table) {
-            if (elem != "0" && elem != Deleted) {
-                table2.Add(elem);
-            }
-        }
-        *this = std::move(table2);
     }
 };
 
