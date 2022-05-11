@@ -15,7 +15,7 @@ unsigned long long Sum(const std::string &s, int table_size) {
 }
 
 int Hash(const std::string &s, int i, int table_size, unsigned long long k = 0) {
-    return (k + i * i / 2 + i / 2) % table_size;
+    return (k + (i * (i + 1))/2) % table_size;
 }
 
 class HashTable {
